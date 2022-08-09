@@ -1,0 +1,7 @@
+<!-- Configuracion de APACHE -->
+<!-- Habilitar a sobreescritura de reglas en el servidor -->
+RewriteEngine On
+<!-- Denegar la vista de archivos desde el navegador -->
+Options All -Indexes
+<!-- Utilzar simbolos en las urls con php -->
+RewriteRule ^([a-zA-Z0-9/ñÑ-]+)$ index.php?views=$1
