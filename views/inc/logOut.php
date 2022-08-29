@@ -1,14 +1,14 @@
 <script>
-    let btnClose = document.querySelector(".btn-exit-system")
+    let btnClose = document.querySelector(".btn-exit-system");
 
     // ESCCHAR UN EVENTO CLICK Y EJECUTAR UNA FUNCION PREVINIENDO LA MISMA
     btnClose.addEventListener('click', function(e){
         e.preventDefault();
 
         Swal.fire({
-            type: 'error',
 			title: 'Estas seguro de salir del sistema?',
 			text: "La sesion actual se cerrara correctamente",
+            icon: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',

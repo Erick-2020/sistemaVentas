@@ -15,8 +15,17 @@
 </div>
 
 <!--CONTENT-->
+<?php
+    require_once "./controllers/companyController.php";
+    $insCompany = new companyController();
+
+    $dataCompany = $insCompany->dataCompanyController();
+
+    if($dataCompany->rowCount() == 0){
+?>
 <div class="container-fluid">
-    <form action="" class="form-neon" autocomplete="off">
+    <form class="form-neon FormularioAjax" action="<?php echo SERVERURL; ?>ajax/companyAjax.php"
+		method="POST" data-form="save" autocomplete="off">
         <fieldset>
             <legend><i class="far fa-building"></i> &nbsp; Información de la empresa</legend>
             <div class="container-fluid">
@@ -57,36 +66,52 @@
         </p>
     </form>
 </div>
+<?php
+    }elseif($dataCompany->rowCount()==1 && ($_SESSION['privilegio_sv'] ==1
+    || $_SESSION['privilegio_sv'] ==2) ){
+
+        $dataArray = $dataCompany->fetch();
+?>
 
 <div class="container-fluid">
-    <form action="" class="form-neon" autocomplete="off">
+    <form class="form-neon FormularioAjax" action="<?php echo SERVERURL; ?>ajax/companyAjax.php"
+		method="POST" data-form="update" autocomplete="off">
         <fieldset>
+            <input type="hidden" name="company_id_up" value="<?php echo $dataArray['empresa_id']; ?>" >
             <legend><i class="far fa-building"></i> &nbsp;Actualizar Información de la empresa</legend>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 col-md-6">
                         <div class="form-group">
                             <label for="empresa_nombre" class="bmd-label-floating">Nombre de la empresa</label>
-                            <input type="text" pattern="[a-zA-z0-9áéíóúÁÉÍÓÚñÑ. ]{1,70}" class="form-control" name="empresa_nombre_up" id="empresa_nombre" maxlength="70">
+                            <input type="text" pattern="[a-zA-z0-9áéíóúÁÉÍÓÚñÑ. ]{1,70}"
+                            class="form-control" name="empresa_nombre_up" id="empresa_nombre"
+                            value="<?php echo $dataArray['empresa_nombre']; ?>" maxlength="70">
                         </div>
                     </div>
 
                     <div class="col-12 col-md-6">
                         <div class="form-group">
                             <label for="empresa_email" class="bmd-label-floating">Correo</label>
-                            <input type="email" class="form-control" name="empresa_email_up" id="empresa_email" maxlength="70">
+                            <input type="email" class="form-control" name="empresa_email_up"
+                            id="empresa_email" value="<?php echo $dataArray['empresa_email']; ?>"
+                            maxlength="70">
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="form-group">
                             <label for="empresa_telefono" class="bmd-label-floating">Telefono</label>
-                            <input type="text" pattern="[0-9()+]{8,20}" class="form-control" name="empresa_telefono_up" id="empresa_telefono" maxlength="20">
+                            <input type="text" pattern="[0-9()+]{8,20}" class="form-control"
+                            name="empresa_telefono_up" id="empresa_telefono"
+                            value="<?php echo $dataArray['empresa_telefono']; ?>" maxlength="20">
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="form-group">
                             <label for="empresa_direccion" class="bmd-label-floating">Dirección</label>
-                            <input type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,190}" class="form-control" name="empresa_direccion_up" id="empresa_direccion" maxlength="190">
+                            <input type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,190}"
+                            class="form-control" name="empresa_direccion_up" id="empresa_direccion"
+                            value="<?php echo $dataArray['empresa_direccion']; ?>" maxlength="190">
                         </div>
                     </div>
                 </div>
@@ -98,9 +123,15 @@
         </p>
     </form>
 </div>
+<?php
+    }else{
+?>
 
 <div class="alert alert-danger text-center" role="alert">
     <p><i class="fas fa-exclamation-triangle fa-5x"></i></p>
     <h4 class="alert-heading">¡Ocurrió un error inesperado!</h4>
     <p class="mb-0">Lo sentimos, no podemos mostrar la información solicitada debido a un error.</p>
 </div>
+<?php
+    }
+?>

@@ -82,6 +82,8 @@
                 // PROCESAR POR HASH(MD5) UN ID UNICO DE INICIO SESION Y PODER VOLVERLA A CERRAR CON DICHO ID
                 $_SESSION['token_sv'] = md5(uniqid(mt_rand(),true));
 
+                return header("Location: ".SERVERURL."home/");
+
                 // verificamos si se envian encabezados por php
                 if(headers_sent()){
                     echo "<script> window.location.href='".SERVERURL."home/'; </script>";

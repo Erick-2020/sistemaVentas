@@ -75,7 +75,7 @@
   line-height: inherit; }
 
 .fa-border {
-  border: solid 0.08em rgb(219, 0, 0);
+  border: solid 0.08em #eee;
   border-radius: .1em;
   padding: .2em .25em .15em; }
 
@@ -4366,7 +4366,7 @@ readers do not read off random characters that represent icons */
   src: url("../webfonts/fa-brands-400.eot?#iefix") format("embedded-opentype"), url("../webfonts/fa-brands-400.woff2") format("woff2"), url("../webfonts/fa-brands-400.woff") format("woff"), url("../webfonts/fa-brands-400.ttf") format("truetype"), url("../webfonts/fa-brands-400.svg#fontawesome") format("svg"); }
 
 .fab {
-  font-family: 'Times New Roman', Times, serif; }
+  font-family: 'Font Awesome 5 Brands'; }
 @font-face {
   font-family: 'Font Awesome 5 Free';
   font-style: normal;
@@ -4388,5 +4388,5 @@ readers do not read off random characters that represent icons */
 
 .fa,
 .fas {
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Font Awesome 5 Free';
   font-weight: 900; }

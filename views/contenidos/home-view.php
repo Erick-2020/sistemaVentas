@@ -10,19 +10,31 @@
 
 <!-- Content -->
 <div class="full-box tile-container">
+	<?php 
+		require_once "./controllers/clientController.php";
+		$insClient = new clientController();
+
+		$totalClient = $insClient->dataClientController("Conteo",0);
+	?>
+
 	<a href="<?php echo SERVERURL; ?>client-new/" class="tile">
 		<div class="tile-tittle">Clientes</div>
 		<div class="tile-icon">
 			<i class="fas fa-users fa-fw"></i>
-			<p>5 Registrados</p>
+			<p><?php echo $totalClient->rowCount(); ?> Registrados</p>
 		</div>
 	</a>
+	<?php
+			require_once "./controllers/itemController.php";
+			$insItem = new itemController();
 
+			$totalItem = $insItem->dataItemController("Conteo",0);
+	?>
 	<a href="<?php echo SERVERURL; ?>item-list/" class="tile">
-		<div class="tile-tittle">Items</div>
+		<div class="tile-tittle">Productos</div>
 		<div class="tile-icon">
 			<i class="fas fa-pallet fa-fw"></i>
-			<p>9 Registrados</p>
+			<p><?php echo $totalItem->rowCount(); ?> Registrados</p>
 		</div>
 	</a>
 
@@ -50,16 +62,27 @@
 		</div>
 	</a>
 
-	<?php if($_SESSION['privilegio_sv'] == 1){  ?>
+	<?php
+		if($_SESSION['privilegio_sv'] == 1){
+			require_once "./controllers/usuController.php";
+			$insUsu = new usuController();
+
+			$totalUsu = $insUsu->dataUserController("Conteo",0);
+	?>
 	<a href="<?php echo SERVERURL; ?>user-list/" class="tile">
 		<div class="tile-tittle">Usuarios</div>
 		<div class="tile-icon">
 			<i class="fas fa-user-secret fa-fw"></i>
-			<p>50 Registrados</p>
+			<p><?php echo $totalUsu->rowCount(); ?> Registrados</p>
 		</div>
 	</a>
 	<?php } ?>
+	<?php
+		if($_SESSION['privilegio_sv'] == 1){
+			require_once "./controllers/usuController.php";
+			$insUsu = new usuController();
 
+	?>
 	<a href="<?php echo SERVERURL; ?>company/" class="tile">
 		<div class="tile-tittle">Empresa</div>
 		<div class="tile-icon">
@@ -67,4 +90,5 @@
 			<p>1 Registrada</p>
 		</div>
 	</a>
+	<?php } ?>
 </div>

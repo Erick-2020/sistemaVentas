@@ -28,7 +28,48 @@
         }
 
         // eliminar usuario
-        // protected static function deleteUsuModel($id){
-        //     $sql = mainModel::connection()->prepare()
-        // }
+        protected static function deleteUsuModel($idDelete){
+            $sql = mainModel::connection()->prepare("DELETE FROM usuario WHERE usuario_id=:ID");
+            $sql->bindParam(":ID", $idDelete);
+            $sql->execute();
+            return $sql;
+        }
+
+        // Datos del usuario
+        protected static function dataUserModel($type, $id){
+            if($type == "Unico"){
+                $sql = mainModel::connection()->prepare("SELECT * FROM usuario WHERE usuario_id =:ID");
+                $sql->bindParam(":ID", $id);
+            }elseif($type == "Conteo"){
+                $sql = mainModel::connection()->prepare("SELECT usuario_id FROM usuario
+                WHERE usuario_id !='1'");
+            }
+            $sql->execute();
+            return $sql;
+        }
+
+        // ACTUALIZAR USUARIO
+        protected static function updateUsuModel($dataArray){
+            $sql = mainModel::connection()->prepare("UPDATE usuario SET usuario_dni=:DNI,
+            usuario_nombre=:NAMES, usuario_apellido=:LASTNAME, usuario_telefono=:PHONE,
+            usuario_direccion=:ADDRESSS, usuario_email=:EMAIL, usuario_usuario=:USER,
+            usuario_clave=:PASSWORDS, usuario_estado=:STATUSS, usuario_privilegio=:PRIVILEGIO
+            WHERE usuario_id =:ID");
+
+            $sql->bindParam(":DNI", $dataArray['DNI']);
+            $sql->bindParam(":NAMES", $dataArray['NAME']);
+            $sql->bindParam(":LASTNAME", $dataArray['LASTNAME']);
+            $sql->bindParam(":PHONE", $dataArray['PHONE']);
+            $sql->bindParam(":ADDRESSS", $dataArray['ADDRESS']);
+            $sql->bindParam(":EMAIL", $dataArray['EMAIL']);
+            $sql->bindParam(":USER", $dataArray['USER']);
+            $sql->bindParam(":PASSWORDS", $dataArray['PASSWORD']);
+            $sql->bindParam(":STATUSS", $dataArray['STATUS']);
+            $sql->bindParam(":PRIVILEGIO", $dataArray['PRIVILEGIO']);
+            $sql->bindParam(":ID", $dataArray['ID']);
+            $sql->execute();
+
+            return $sql;
+
+        }
     }

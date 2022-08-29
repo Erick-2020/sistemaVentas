@@ -24,7 +24,17 @@
 
 <!--CONTENT-->
 <div class="container-fluid">
-	<form action="" class="form-neon" autocomplete="off">
+<?php
+			require_once "./controllers/itemController.php";
+			$insItem = new itemController();
+
+			$dataItem = $insItem->dataItemController("Unico", $page[1]);
+			if($dataItem->rowCount() == 1){
+				$dataArray = $dataItem->fetch();
+		?>
+	<form class="form-neon FormularioAjax" autocomplete="off" action="<?php echo SERVERURL; ?>ajax/itemAjax.php"
+	method="POST" data-form="update">
+	<input type="hidden" name="item_id_up" value="<?php echo $page[1]; ?>" >
 		<fieldset>
 			<legend><i class="far fa-plus-square"></i> &nbsp; Información del item</legend>
 			<div class="container-fluid">
@@ -32,36 +42,51 @@
 					<div class="col-12 col-md-4">
 						<div class="form-group">
 							<label for="item_codigo" class="bmd-label-floating">Códido</label>
-							<input type="text" pattern="[a-zA-Z0-9-]{1,45}" class="form-control" name="item_codigo_up" id="item_codigo" maxlength="45">
+							<input type="text" pattern="[a-zA-Z0-9-]{1,45}" class="form-control"
+							name="item_codigo_up" id="item_codigo" maxlength="45"
+							value= "<?php echo $dataArray['item_codigo']; ?>">
 						</div>
 					</div>
 					
 					<div class="col-12 col-md-4">
 						<div class="form-group">
 							<label for="item_nombre" class="bmd-label-floating">Nombre</label>
-							<input type="text" pattern="[a-zA-záéíóúÁÉÍÓÚñÑ0-9 ]{1,140}" class="form-control" name="item_nombre_up" id="item_nombre" maxlength="140">
+							<input type="text" pattern="[a-zA-záéíóúÁÉÍÓÚñÑ0-9 ]{1,140}"
+							class="form-control" name="item_nombre_up" id="item_nombre" maxlength="140"
+							value= "<?php echo $dataArray['item_nombre']; ?>">
 						</div>
 					</div>
 					<div class="col-12 col-md-4">
 						<div class="form-group">
 							<label for="item_stock" class="bmd-label-floating">Stock</label>
-							<input type="num" pattern="[0-9]{1,9}" class="form-control" name="item_stock_up" id="item_stock" maxlength="9">
+							<input type="num" pattern="[0-9]{1,9}" class="form-control"
+							name="item_stock_up" id="item_stock" maxlength="9"
+							value= "<?php echo $dataArray['item_stock']; ?>">
 						</div>
 					</div>
 					<div class="col-12 col-md-6">
 						<div class="form-group">
 							<label for="item_estado" class="bmd-label-floating">Estado</label>
 							<select class="form-control" name="item_estado_up" id="item_estado">
-								<option value="" selected="" disabled="">Seleccione una opción</option>
-								<option value="Habilitado">Habilitado</option>
-								<option value="Deshabilitado">Deshabilitado</option>
+								<option value="Habilitado"
+									<?php if($dataArray['item_estado'] == "Habilitado")
+									{ echo 'selected=""';} ?>
+								>Habilitado <?php if($dataArray['item_estado'] == "Habilitado")
+									{ echo '(Actual)';} ?></option>
+								<option value="Deshabilitado"
+									<?php if($dataArray['item_estado'] == "Deshabilitado")
+									{ echo 'selected=""'; } ?>
+								>Deshabilitado<?php if($dataArray['item_estado'] == "Deshabilitado")
+									{ echo '(Actual)';} ?></option>
 							</select>
 						</div>
 					</div>
 					<div class="col-12 col-md-6">
 						<div class="form-group">
 							<label for="item_detalle" class="bmd-label-floating">Detalle</label>
-							<input type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,190}" class="form-control" name="item_detalle_up" id="item_detalle" maxlength="190">
+							<input type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,190}"
+							class="form-control" name="item_detalle_up" id="item_detalle" maxlength="190"
+							value="<?php echo $dataArray['item_detalle']; ?>">
 						</div>
 					</div>
 				</div>
@@ -72,10 +97,16 @@
 			<button type="submit" class="btn btn-raised btn-success btn-sm"><i class="fas fa-sync-alt"></i> &nbsp; ACTUALIZAR</button>
 		</p>
 	</form>
+	<?php
+		}else{
+	?>
 
 	<div class="alert alert-danger text-center" role="alert">
 		<p><i class="fas fa-exclamation-triangle fa-5x"></i></p>
 		<h4 class="alert-heading">¡Ocurrió un error inesperado!</h4>
 		<p class="mb-0">Lo sentimos, no podemos mostrar la información solicitada debido a un error.</p>
 	</div>
+	<?php
+		}
+	?>
 </div>

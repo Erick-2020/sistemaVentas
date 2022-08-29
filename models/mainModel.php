@@ -40,7 +40,7 @@
 		}
 
         // DESEENCRIPTAR POR MEDIO DEL HASH
-		public static function decryption($string){
+		protected static function decryption($string){
 			$key=hash('sha256', SECRET_KEY);
 			$iv=substr(hash('sha256', SECRET_IV), 0, 16);
 			$output=openssl_decrypt(base64_decode($string), METHOD, $key, 0, $iv);
@@ -110,7 +110,7 @@
         //VALIDACION FECHA
         protected static function validationDate($date){
             $result=explode('-', $date);
-            if(count($result) == 3 && checkdate($result[1],result[2],$result[0])){
+            if(count($result) == 3 && checkdate($result[1],$result[2],$result[0])){
                 return false;
             }else{
                 return true;
@@ -118,50 +118,46 @@
         }
 
         // PAGINADOR TABLAS
-        protected static function paginador($pages, $pagesNumber, $url, $buttons){
-            $table = '<nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">';
+		protected static function paginador($pages,$nPages,$url,$buttons){
+			$table='<nav aria-label="Page navigation example"><ul class="pagination justify-content-center">';
 
-            if($pages==1){
-                $table.='<li class="page-item disabled">
-				<a class="page-link"><i class="fa-thin fa-angles-left"></i></a></li>';
-            }else{
-                $table.='
-                <li class="page-item">
-				<a class="page-link" href="'.$url.'1/"><i class="fa-thin fa-angles-left"></i></a></li>
-                <li class="page-item">
-				<a class="page-link" href="'.$url.($pages-1).'/">Anterior</a></li>';
-            }
+			if($pages==1){
+				$table.='<li class="page-item disabled"><a class="page-link"><i class="fas fa-angle-double-left"></i></a></li>';
+			}else{
+				$table.='
+				<li class="page-item"><a class="page-link" href="'.$url.'1/"><i class="fas fa-angle-double-left"></i></a></li>
+				<li class="page-item"><a class="page-link" href="'.$url.($pages-1).'/">Anterior</a></li>
+				';
+			}
 
-            $cicle=0;
-            for($i=$pages; $i<=$pagesNumber; $i++){
-                if($cicle>=$buttons){
-                    break;
-                }
-                if($pages == $i){
-                    $table.='<li class="page-item">
-                    <a class="page-link" active href="'.$url.$i.'/">'.$i.'</a></li>';
-                }else{
-                    $table.='<li class="page-item">
-                    <a class="page-link" href="'.$url.$i.'/">'.$i.'</a></li>';
-                }
-                $cicle++;
-            }
 
-            if($pages=$pagesNumber){
-                $table.='<li class="page-item disabled">
-				<a class="page-link"><i class="fa-thin fa-angles-right"></i></a></li>';
-            }else{
-                $table.='
-                <li class="page-item">
-				<a class="page-link" href="'.$url.($pages+1).'/">Siguiente</a></li>
-                <li class="page-item">
-				<a class="page-link" href="'.$url.$pagesNumber.'/"><i class="fa-thin fa-angles-right"></i></a></li>';
-            }
+			$ci=0;
+			for($i=$pages; $i<=$nPages; $i++){
+				if($ci>=$buttons){
+					break;
+				}
 
-            $table.= '</ul></nav>';
+				if($pages==$i){
+					$table.='<li class="page-item"><a class="page-link active" href="'.$url.$i.'/">'.$i.'</a></li>';
+				}else{
+					$table.='<li class="page-item"><a class="page-link" href="'.$url.$i.'/">'.$i.'</a></li>';
+				}
 
-            return $table;
-        }
+				$ci++;
+			}
+
+
+			if($pages==$nPages){
+				$table.='<li class="page-item disabled"><a class="page-link"><i class="fas fa-angle-double-right"></i></a></li>';
+			}else{
+				$table.='
+				<li class="page-item"><a class="page-link" href="'.$url.($pages+1).'/">Siguiente</a></li>
+				<li class="page-item"><a class="page-link" href="'.$url.$nPages.'/"><i class="fas fa-angle-double-right"></i></a></li>
+				';
+			}
+
+			$table.='</ul></nav>';
+			return $table;
+		}
 
     }

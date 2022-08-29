@@ -22,15 +22,21 @@
 	</ul>
 </div>
 
+<?php
+	// SI LA VARIABLE DE SESION NO ESTA DEFINIDA O NO EXISTE
+	if(!isset($_SESSION['busqueda_cliente']) && empty($_SESSION['busqueda_cliente']) ){
+?>
 <!-- Content here-->
 <div class="container-fluid">
-	<form class="form-neon" action="">
+<form class="FormularioAjax form-neon" action="<?php echo SERVERURL; ?>ajax/searchAjax.php"
+	method="POST" data-form="search" autocomplete="off">
+	<input type="hidden" name="modul" value="cliente">
 		<div class="container-fluid">
 			<div class="row justify-content-md-center">
 				<div class="col-12 col-md-6">
 					<div class="form-group">
 						<label for="inputSearch" class="bmd-label-floating">¿Qué cliente estas buscando?</label>
-						<input type="text" class="form-control" name="busqueda-" id="inputSearch" maxlength="30">
+						<input type="text" class="form-control" name="busquedaInicial" id="inputSearch" maxlength="30">
 					</div>
 				</div>
 				<div class="col-12">
@@ -42,15 +48,19 @@
 		</div>
 	</form>
 </div>
-
+<?php }else{ ?>
 <div class="container-fluid">
-	<form action="">
-		<input type="hidden" name="eliminar-busqueda" value="eliminar">
+<form class="FormularioAjax form-neon" action="<?php echo SERVERURL; ?>ajax/searchAjax.php"
+	method="POST" data-form="search" autocomplete="off">
+	<input type="hidden" name="modul" value="cliente">
+		<input type="hidden" name="eliminarBusqueda" value="eliminar">
 		<div class="container-fluid">
 			<div class="row justify-content-md-center">
 				<div class="col-12 col-md-6">
 					<p class="text-center" style="font-size: 20px;">
-						Resultados de la busqueda <strong>“Buscar”</strong>
+						Resultados de la busqueda <strong>
+							“<?php echo $_SESSION['busqueda_cliente']; ?>”
+						</strong>
 					</p>
 				</div>
 				<div class="col-12">
@@ -64,131 +74,16 @@
 </div>
 
 <div class="container-fluid">
-	<div class="table-responsive">
-		<table class="table table-dark table-sm">
-			<thead>
-				<tr class="text-center roboto-medium">
-					<th>#</th>
-					<th>DNI</th>
-					<th>NOMBRE</th>
-					<th>APELLIDO</th>
-					<th>TELEFONO</th>
-					<th>DIRECCIÓN</th>
-					<th>ACTUALIZAR</th>
-					<th>ELIMINAR</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="text-center" >
-					<td>1</td>
-					<td>012342567</td>
-					<td>NOMBRE DEL CLIENTE</td>
-					<td>APELLIDO DEL CLIENTE</td>
-					<td>72349874</td>
-					<td>
-						<button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del cliente" data-content="Direccion completa del cliente">
-							<i class="fas fa-info-circle"></i>
-						</button>
-					</td>
-					<td>
-						<a href="<?php echo SERVERURL; ?>client-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>	
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-				<tr class="text-center" >
-					<td>2</td>
-					<td>012342567</td>
-					<td>NOMBRE DEL CLIENTE</td>
-					<td>APELLIDO DEL CLIENTE</td>
-					<td>72349874</td>
-					<td>
-						<button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del cliente" data-content="Direccion completa del cliente">
-							<i class="fas fa-info-circle"></i>
-						</button>
-					</td>
-					<td>
-						<a href="<?php echo SERVERURL; ?>client-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>	
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-				<tr class="text-center" >
-					<td>3</td>
-					<td>012342567</td>
-					<td>NOMBRE DEL CLIENTE</td>
-					<td>APELLIDO DEL CLIENTE</td>
-					<td>72349874</td>
-					<td>
-						<button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del cliente" data-content="Direccion completa del cliente">
-							<i class="fas fa-info-circle"></i>
-						</button>
-					</td>
-					<td>
-						<a href="<?php echo SERVERURL; ?>client-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>	
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-				<tr class="text-center" >
-					<td>4</td>
-					<td>012342567</td>
-					<td>NOMBRE DEL CLIENTE</td>
-					<td>APELLIDO DEL CLIENTE</td>
-					<td>72349874</td>
-					<td>
-						<button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del cliente" data-content="Direccion completa del cliente">
-							<i class="fas fa-info-circle"></i>
-						</button>
-					</td>
-					<td>
-						<a href="<?php echo SERVERURL; ?>client-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>	
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<nav aria-label="Page navigation example">
-		<ul class="pagination justify-content-center">
-			<li class="page-item disabled">
-				<a class="page-link" href="#" tabindex="-1">Previous</a>
-			</li>
-			<li class="page-item"><a class="page-link" href="#">1</a></li>
-			<li class="page-item"><a class="page-link" href="#">2</a></li>
-			<li class="page-item"><a class="page-link" href="#">3</a></li>
-			<li class="page-item">
-				<a class="page-link" href="#">Next</a>
-			</li>
-		</ul>
-	</nav>
+<?php
+		require_once './controllers/clientController.php';
+		$insClient = new clientController();
+
+		// UsupaginatorController($actualPage, $registers, $privilegio, $url, $busqueda){
+			// los array se cuentan desde 0,
+			// 0 = vista y de 1 en adelante son las paginas de los datos que se muestran
+			// la busqueda no se define ya que este es el listado general
+		echo $insClient->clientPaginatorController($page[1], 5, $_SESSION['privilegio_sv'],
+		$page[0],$_SESSION['busqueda_cliente']);
+?>
 </div>
+<?php } ?>

@@ -35,13 +35,13 @@
 				<div class="col-12 col-md-4">
 					<div class="form-group">
 						<label for="busqueda_inicio_prestamo" >Fecha inicial (día/mes/año)</label>
-						<input type="date" class="form-control" name="busqueda_inicio_prestamo" id="busqueda_inicio_prestamo" maxlength="30">
+						<input type="date" class="form-control" name="busquedaPrestamoInicial" id="busqueda_inicio_prestamo" maxlength="30">
 					</div>
 				</div>
 				<div class="col-12 col-md-4">
 					<div class="form-group">
 						<label for="busqueda_final_prestamo" >Fecha final (día/mes/año)</label>
-						<input type="date" class="form-control" name="busqueda_final_prestamo" id="busqueda_final_prestamo" maxlength="30">
+						<input type="date" class="form-control" name="busquedaPrestamoFinal" id="busqueda_final_prestamo" maxlength="30">
 					</div>
 				</div>
 				<div class="col-12">
@@ -57,7 +57,7 @@
 
 <div class="container-fluid">
 	<form action="">
-		<input type="hidden" name="eliminar_busqueda_prestamo" value="eliminar">
+		<input type="hidden" name="eliminarBusqueda" value="eliminar">
 		<div class="container-fluid">
 			<div class="row justify-content-md-center">
 				<div class="col-12 col-md-6">
@@ -177,12 +177,12 @@
 					<td><span class="badge badge-primary">Cancelado</span></td>
 					<td>
 						<a href="#" class="btn btn-info">
-								<i class="fas fa-file-pdf"></i>	
+								<i class="fas fa-file-pdf"></i>
 						</a>
 					</td>
 					<td>
 						<a href="<?php echo SERVERURL; ?>reservation-update/" class="btn btn-success">
-								<i class="fas fa-sync-alt"></i>	
+								<i class="fas fa-sync-alt"></i>
 						</a>
 					</td>
 					<td>

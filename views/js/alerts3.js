@@ -28,7 +28,7 @@ function sendFormuAjax(e){
         mode: 'cors',
         cache: 'no-cache',
         body:data
-    };
+    }
 
     let alertText;
 
@@ -49,9 +49,9 @@ function sendFormuAjax(e){
     }
 
     Swal.fire({
-        title: 'Excelente',
+        title: 'Seguro',
         text: alertText,
-        icon: 'success',
+        icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
@@ -63,13 +63,11 @@ function sendFormuAjax(e){
             // ENVIAR DATOS
             fetch(action, config)
             // parsear o colocar los datos en formato json
-            .then(respuesta => {
-                return respuesta.json()
-            })
+            .then(respuesta => respuesta.json())
             // retornar las alertas correspondientes
             .then(respuesta => {
                 return alerts(respuesta);
-            })
+            });
         }
     });
 
@@ -100,7 +98,7 @@ function alerts(alert){
             icon: alert.type,
             confirmButtonText: "Aceptar"
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.value) {
                 location.reload();
             }
         })
@@ -111,7 +109,7 @@ function alerts(alert){
             icon: alert.type,
             confirmButtonText: "Aceptar"
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.value) {
                 document.querySelector(".FormularioAjax").reset();
             }
         })

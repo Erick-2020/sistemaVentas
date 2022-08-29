@@ -39,7 +39,7 @@
 			// los array se cuentan desde 0,
 			// 0 = vista y de 1 en adelante son las paginas de los datos que se muestran
 			// la busqueda no se define ya que este es el listado general
-		echo $insUsu->UsupaginatorController($page[1], 3, $_SESSION['privilegio_sv'], $_SESSION['id_sv'],
+		echo $insUsu->UsupaginatorController($page[1], 5, $_SESSION['privilegio_sv'], $_SESSION['id_sv'],
 		$page[0],"");
 	?>
 </div>

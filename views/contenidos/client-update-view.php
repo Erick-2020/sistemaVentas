@@ -1,17 +1,10 @@
-<section class="full-box page-content">
-	<nav class="full-box navbar-info">
-		<a href="#" class="float-left show-nav-lateral">
-			<i class="fas fa-exchange-alt"></i>
-		</a>
-		<a href="<?php echo SERVERURL; ?>user-update/">
-			<i class="fas fa-user-cog"></i>
-		</a>
-		<a href="#" class="btn-exit-system">
-			<i class="fas fa-power-off"></i>
-		</a>
-	</nav>
-
-	<!-- Page header -->
+<?php
+	if($_SESSION['privilegio_sv'] <1 || $_SESSION['privilegio_sv'] >2){ 
+		echo $loginController->closedSesion();
+	exit();
+	}
+?>
+<!-- Page header -->
 	<div class="full-box page-header">
 		<h3 class="text-left">
 			<i class="fas fa-sync-alt fa-fw"></i> &nbsp; ACTUALIZAR CLIENTE
@@ -37,7 +30,17 @@
 
 	<!-- Content here-->
 	<div class="container-fluid">
-		<form action="" class="form-neon" autocomplete="off">
+		<?php
+			require_once "./controllers/clientController.php";
+			$insClient = new clientController();
+
+			$dataClient = $insClient->dataClientController("Unico", $page[1]);
+			if($dataClient->rowCount() == 1){
+				$dataArray = $dataClient->fetch();
+		?>
+		<form class="form-neon FormularioAjax" autocomplete="off" action="<?php echo SERVERURL; ?>ajax/clientAjax.php"
+		method="POST" data-form="update">
+			<input type="hidden" name="cliente_id_up" value="<?php echo $page[1]; ?>">
 			<fieldset>
 				<legend><i class="fas fa-user"></i> &nbsp; Información básica</legend>
 				<div class="container-fluid">
@@ -45,31 +48,44 @@
 						<div class="col-12 col-md-6">
 							<div class="form-group">
 								<label for="cliente_dni" class="bmd-label-floating">DNI</label>
-								<input type="text" pattern="[0-9-]{1,27}" class="form-control" name="cliente_dni_up" id="cliente_dni" maxlength="27">
+								<input type="text" pattern="[0-9-]{1,27}" class="form-control"
+								name="cliente_dni_up" id="cliente_dni" maxlength="27"
+								value="<?php echo $dataArray['cliente_dni']; ?>">
 							</div>
 						</div>
 						<div class="col-12 col-md-6">
 							<div class="form-group">
 								<label for="cliente_nombre" class="bmd-label-floating">Nombre</label>
-								<input type="text" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,40}" class="form-control" name="cliente_nombre_up" id="cliente_nombre" maxlength="40">
+								<input type="text" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,40}"
+								class="form-control" name="cliente_nombre_up" id="cliente_nombre"
+								maxlength="40"
+								value="<?php echo $dataArray['cliente_nombre']; ?>">
 							</div>
 						</div>
 						<div class="col-12 col-md-4">
 							<div class="form-group">
 								<label for="cliente_apellido" class="bmd-label-floating">Apellido</label>
-								<input type="text" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,40}" class="form-control" name="cliente_apellido_up" id="cliente_apellido" maxlength="40">
+								<input type="text" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,40}"
+								class="form-control" name="cliente_apellido_up" id="cliente_apellido"
+								maxlength="40"
+								value="<?php echo $dataArray['cliente_apellido']; ?>">
 							</div>
 						</div>
 						<div class="col-12 col-md-4">
 							<div class="form-group">
 								<label for="cliente_telefono" class="bmd-label-floating">Teléfono</label>
-								<input type="text" pattern="[0-9()+]{8,20}" class="form-control" name="cliente_telefono_up" id="cliente_telefono" maxlength="20">
+								<input type="text" pattern="[0-9()+]{8,20}" class="form-control"
+								name="cliente_telefono_up" id="cliente_telefono" maxlength="20"
+								value="<?php echo $dataArray['cliente_telefono']; ?>">
 							</div>
 						</div>
 						<div class="col-12 col-md-4">
 							<div class="form-group">
 								<label for="cliente_direccion" class="bmd-label-floating">Dirección</label>
-								<input type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,150}" class="form-control" name="cliente_direccion_up" id="cliente_direccion" maxlength="150">
+								<input type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,150}"
+								class="form-control" name="cliente_direccion_up" id="cliente_direccion"
+								maxlength="150"
+								value="<?php echo $dataArray['cliente_direccion']; ?>">
 							</div>
 						</div>
 					</div>
@@ -81,11 +97,16 @@
 			</p>
 		</form>
 
+		<?php
+			}else{
+		?>
+
 		<div class="alert alert-danger text-center" role="alert">
 			<p><i class="fas fa-exclamation-triangle fa-5x"></i></p>
 			<h4 class="alert-heading">¡Ocurrió un error inesperado!</h4>
 			<p class="mb-0">Lo sentimos, no podemos mostrar la información solicitada debido a un error.</p>
 		</div>
+		<?php
+			}
+		?>
 	</div>
-
-</section>

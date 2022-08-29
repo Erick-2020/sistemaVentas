@@ -33,16 +33,31 @@
         <div class="container-fluid">
             <p class="text-center roboto-medium">AGREGAR CLIENTE O ITEMS</p>
             <p class="text-center">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCliente"><i class="fas fa-user-plus"></i> &nbsp; Agregar cliente</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalItem"><i class="fas fa-box-open"></i> &nbsp; Agregar item</button>
+                <!-- COMPROVAR SI LA VARIABLE DE SESION VIENE VACIA  -->
+                <?php if(empty($_SESSION['datos_cliente'])){ ?>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCliente">
+                    <i class="fas fa-user-plus"></i> &nbsp; Agregar cliente
+                </button>
+                <?php } ?>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalItem">
+                    <i class="fas fa-box-open"></i> &nbsp; Agregar item
+                </button>
             </p>
             <div>
-                <span class="roboto-medium">CLIENTE:</span> 
+                <span class="roboto-medium">CLIENTE:</span>
+                <?php if(empty($_SESSION['datos_cliente'])){ ?>
                 <span class="text-danger">&nbsp; <i class="fas fa-exclamation-triangle"></i> Seleccione un cliente</span>
-                <form action="" style="display: inline-block !important;">
-                    Carlos Alfaro
-                    <button type="button" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
+                <?php }else{ ?>
+                <form class="FormularioAjax" action="<?php echo SERVERURL; ?>ajax/prestamosAjax.php"
+                style="display: inline-block !important;" method="POST" data-form="loans">
+
+                    <input type="hidden" name="id_eliminar_cliente" value="<?php echo $_SESSION['datos_cliente']['ID']; ?>">
+                    <?php echo $_SESSION['datos_cliente']['NAME']." ".$_SESSION['datos_cliente']['LASTNAME']; ?>
+
+                    <!-- btn cierre de sesion -->
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
                 </form>
+                <?php } ?>
             </div>
             <div class="table-responsive">
                 <table class="table table-dark table-sm">
@@ -58,70 +73,66 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php
+                            if( isset($_SESSION['datos_item']) && count($_SESSION['datos_item'])>=1 ){
+
+                                $_SESSION['prestamo_total']=0;
+                                $_SESSION['prestamo_item']=0;
+
+                                foreach($_SESSION['datos_item'] as $items){
+                                    // calculamos cuanto vale el prestamo
+                                    $subTotal = $items['AMOUNT']*($items['COSTO'] * $items['TIEMPO']);
+
+                                    $subTotal=number_format($subTotal,2,'.','');
+                        ?>
                         <tr class="text-center" >
-                            <td>Silla plastica</td>
-                            <td>7</td>
-                            <td>Hora</td>
-                            <td>$5.00</td>
-                            <td>$35.00</td>
+                            <td><?php echo $items['NAME']; ?></td>
+                            <td><?php echo $items['CANTIDAD']; ?></td>
+                            <td><?php echo $items['TIEMPO']." ".$items['FORMAT']; ?></td>
+                            <td><?php echo MODENA.$items['COSTO']. " X1 ".$items['FORMAT']; ?></td>
+                            <td><?php echo MONEDA.$subTotal; ?></td>
                             <td>
-                                <button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del item" data-content="Detalle completo del item">
+                                <button type="button" class="btn btn-info" data-toggle="popover"
+                                data-trigger="hover" title="<?php echo $items['NAME']; ?>"
+                                data-content="<?php echo $items['DETAIL']; ?>">
                                     <i class="fas fa-info-circle"></i>
                                 </button>
                             </td>
                             <td>
-                                <form action="">
+                                <form class="FormularioAjax" action="<?php echo SERVERURL;
+                                ?>ajax/prestamosAjax.php" method="POST" data-form="loans" >
+                                <input type="hidden" name="id_eliminar_item" value="<?php
+                                echo $items['ID'] ?>">
                                     <button type="button" class="btn btn-warning">
                                         <i class="far fa-trash-alt"></i>
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                        <tr class="text-center" >
-                            <td>Silla metalica</td>
-                            <td>9</td>
-                            <td>Día</td>
-                            <td>$5.00</td>
-                            <td>$45.00</td>
-                            <td>
-                                <button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del item" data-content="Detalle completo del item">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <form action="">
-                                    <button type="button" class="btn btn-warning">
-                                        <i class="far fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr class="text-center" >
-                            <td>Mesa plastica</td>
-                            <td>5</td>
-                            <td>Evento</td>
-                            <td>$10.00</td>
-                            <td>$50.00</td>
-                            <td>
-                                <button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" title="Nombre del item" data-content="Detalle completo del item">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <form action="">
-                                    <button type="button" class="btn btn-warning">
-                                        <i class="far fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                        <?php
+                            $_SESSION['prestamo_total'] += $subTotal;
+                            $_SESSION['prestamo_item'] += $items['AMOUNT'];
+                            }
+                        ?>
                         <tr class="text-center bg-light">
                             <td><strong>TOTAL</strong></td>
-                            <td><strong>21 items</strong></td>
+                            <td><strong><?php echo $_SESSION['prestamo_item'] ?> items</strong></td>
                             <td colspan="2"></td>
-                            <td><strong>$130.00</strong></td>
+                            <td><strong><?php echo MONEDA.number_format($$_SESSION['prestamo_total'],
+                            2,'.','') ?></strong></td>
                             <td colspan="2"></td>
                         </tr>
+                        <?php
+                            }else{
+                                $_SESSION['prestamo_total']=0;
+                                $_SESSION['prestamo_item']=0;
+                        ?>
+                        <tr class="text-center" >
+                            <td colspan="7" >No has seleccionado productos</td>
+                        </tr>
+                        <?php
+                            }
+                        ?>
                     </tbody>
                 </table>
             </div>
@@ -231,40 +242,11 @@
                 </div>
                 <br>
                 <div class="container-fluid" id="tabla_clientes">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-sm">
-                            <tbody>
-                                <tr class="text-center">
-                                    <td>0000000000 - Nombre del cliente</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-user-plus"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td>0000000000 - Nombre del cliente</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-user-plus"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td>0000000000 - Nombre del cliente</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-user-plus"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="alert alert-warning" role="alert">
-                    <p class="text-center mb-0">
-                        <i class="fas fa-exclamation-triangle fa-2x"></i><br>
-                        No hemos encontrado ningún cliente en el sistema que coincida con <strong>“Busqueda”</strong>
-                    </p>
+<!-- AQUI VA EL CODIGO DEL CONTROLADOR DE LA TABLA EN PRESTAMOS CONTROLLER -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary"><i class="fas fa-search fa-fw"></i> &nbsp; Buscar</button>
+                <button type="button" class="btn btn-primary" onclick="searchClient()" ><i class="fas fa-search fa-fw"></i> &nbsp; Buscar</button>
                 &nbsp; &nbsp;
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
@@ -287,51 +269,19 @@
                 <div class="container-fluid">
                     <div class="form-group">
                         <label for="input_item" class="bmd-label-floating">Código, Nombre</label>
-                        <input type="text" pattern="[a-zA-z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" class="form-control" name="input_item" id="input_item" maxlength="30">
+                        <input type="text" pattern="[a-zA-z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" class="form-control"
+                        name="input_item" id="input_item" maxlength="30">
                     </div>
                 </div>
                 <br>
                 <div class="container-fluid" id="tabla_items">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-sm">
-                            <tbody>
-                                <tr class="text-center">
-                                    <td>000000000000 - Nombre del item</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-box-open"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td>000000000000 - Nombre del item</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-box-open"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td>000000000000 - Nombre del item</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-box-open"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td>000000000000 - Nombre del item</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary"><i class="fas fa-box-open"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="alert alert-warning" role="alert">
-                    <p class="text-center mb-0">
-                        <i class="fas fa-exclamation-triangle fa-2x"></i><br>
-                        No hemos encontrado ningún item en el sistema que coincida con <strong>“Busqueda”</strong>
-                    </p>
+                <!-- AQUI VA EL CODIGO DEL CONTROLADOR DE LA TABLA EN PRESTAMOS CONTROLLER -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary"><i class="fas fa-search fa-fw"></i> &nbsp; Buscar</button>
+                <button type="button" class="btn btn-primary" onclick="searchItem()">
+                    <i class="fas fa-search fa-fw"></i> &nbsp; Buscar
+                </button>
                 &nbsp; &nbsp;
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
@@ -343,7 +293,8 @@
 <!-- MODAL AGREGAR ITEM -->
 <div class="modal fade" id="ModalAgregarItem" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarItem" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <form class="modal-content FormularioAjax">
+        <form class="modal-content FormularioAjax" action="<?php echo SERVERURL; ?>ajax/prestamosAjax.php"
+        method="POST" data-form="save" autocomplete="off">
             <div class="modal-header">
                 <h5 class="modal-title" id="ModalAgregarItem">Selecciona el formato, cantidad de items, tiempo y costo del préstamo del item</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -389,8 +340,12 @@
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary" >Agregar</button>
                 &nbsp; &nbsp;
-                <button type="button" class="btn btn-secondary" >Cancelar</button>
+                <button type="button" class="btn btn-secondary" onclick="modalSearchItem()">Cancelar</button>
             </div>
         </form>
     </div>
 </div>
+
+<?php
+include_once "./views/inc/reservation.php";
+?>

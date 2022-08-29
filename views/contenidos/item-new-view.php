@@ -24,7 +24,8 @@
 
 <!--CONTENT-->
 <div class="container-fluid">
-	<form action="" class="form-neon" autocomplete="off">
+	<form class="form-neon FormularioAjax" action="<?php echo SERVERURL; ?>ajax/itemAjax.php"
+	method="POST" data-form="save" autocomplete="off">
 		<fieldset>
 			<legend><i class="far fa-plus-square"></i> &nbsp; Información del item</legend>
 			<div class="container-fluid">
@@ -52,7 +53,7 @@
 						<div class="form-group">
 							<label for="item_estado" class="bmd-label-floating">Estado</label>
 							<select class="form-control" name="item_estado_reg" id="item_estado">
-								<option value="" selected="" disabled="">Seleccione una opción</option>
+								<option value="" selected="">Seleccione una opción</option>
 								<option value="Habilitado">Habilitado</option>
 								<option value="Deshabilitado">Deshabilitado</option>
 							</select>

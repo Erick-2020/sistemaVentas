@@ -7,7 +7,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-	<title><?php echo COMPANY ?></title>
+	<title><?php echo COMPANY; ?></title>
     <!-- Style links -->
     <?php include "./views/inc/styleLink.php"; ?>
 
@@ -36,7 +36,7 @@
 
             if(!isset($_SESSION['token_sv']) || !isset($_SESSION['usuario_sv']) ||
             !isset($_SESSION['privilegio_sv']) || !isset($_SESSION['id_sv'])){
-                $loginController->logoutSesionController();
+                echo $loginController->logoutSesionController();
                 exit();
             }
     ?>
@@ -57,9 +57,10 @@
     <!-- cierre del else, para mostrar el resto de la estructura -->
     <!-- SCRIPT -->
     <?php
-    include "./views/inc/script.php";
-        }
         include "./views/inc/logOut.php";
+        }
+        include "./views/inc/script.php";
+        
     ?>
 </body>
 </html>
