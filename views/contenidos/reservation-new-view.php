@@ -89,7 +89,7 @@
                             <td><?php echo $items['NAME']; ?></td>
                             <td><?php echo $items['CANTIDAD']; ?></td>
                             <td><?php echo $items['TIEMPO']." ".$items['FORMAT']; ?></td>
-                            <td><?php echo MODENA.$items['COSTO']. " X1 ".$items['FORMAT']; ?></td>
+                            <td><?php echo MONEDA.$items['COSTO']. " X1 ".$items['FORMAT']; ?></td>
                             <td><?php echo MONEDA.$subTotal; ?></td>
                             <td>
                                 <button type="button" class="btn btn-info" data-toggle="popover"

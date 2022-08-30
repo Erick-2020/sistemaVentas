@@ -159,7 +159,7 @@
             }
                 // SELECCIONAR PRODUCTOS DE LA BD
                 $dataItem = mainModel::sqlConsult_Simple("SELECT * FROM item WHERE (item_codigo
-                LIKE '%$item%' OR item_nombre LIKE '%$item%' OR item_estado LIKE '%$item%')
+                LIKE '%$item%' OR item_nombre LIKE '%$item%')
                 AND (item_estado='Habilitado') ORDER BY item_nombre ASC");
 
                 if($dataItem->rowCount()>=1){
@@ -174,7 +174,7 @@
                     foreach($dataItem as $rows){
                         $table.= '
                             <tr class="text-center">
-                                <td>'.$rows['item_nombre'].' '.$rows['item_estado'].' -
+                                <td>'.$rows['item_nombre'].'-'.$rows['item_estado'].' -
                                 '.$rows['item_stock'].'</td>
                                     <td>
                                         <button type="button" class="btn btn-primary"
@@ -230,7 +230,7 @@
 
             // COMPROBAMOS QUE LOS CAMPOS TENGAN TEXTO
 
-            if($amount="" || $tiempo="" || $costo = ""){
+            if($amount=="" || $tiempo=="" || $costo == ""){
                 $alert=[
                     "Alerta"=>"simple",
                     "title"=>"Error",
