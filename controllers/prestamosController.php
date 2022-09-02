@@ -251,7 +251,7 @@
                 echo json_encode($alert);
                 exit();
             }
-            if(mainModel::validationData("[0-9]{1,7}", $tiempo)){
+            if(mainModel::validationData("[0-9]{1,7}",$tiempo)){
                 $alert=[
                     "Alerta"=>"simple",
                     "title"=>"Error",
@@ -261,7 +261,7 @@
                 echo json_encode($alert);
                 exit();
             }
-            if(mainModel::validationData("[0-9.]{1,15}", $costo)){
+            if(mainModel::validationData("[0-9.]{1,15}",$costo)){
                 $alert=[
                     "Alerta"=>"simple",
                     "title"=>"Error",
@@ -292,7 +292,8 @@
             // VERIFICAR SI EL ARRAY TIENE EL ID DEFINIDO (ID DEL ITEM)
             if(empty($_SESSION['datos_item'][$id])){
                 // SI NO ESTA DEFINIDO LO CREAMOS
-                $costo = number_format($costo,2,'.','');
+                $costo = number_format($costo,0,'','');
+                // CREAMOS EL ARRAY DE SESION
                 $_SESSION['datos_item'][$id] = [
                 "ID"=>$dataArray['item_id'],
                 "CODE"=>$dataArray['item_codigo'],
@@ -324,4 +325,293 @@
                 exit();
             }
         } // FIN CONTROLADOR
+
+        public function deleteItemPrestamoController(){
+            $idDelete = mainModel::stringClear($_POST['id_eliminar_item']);
+
+            session_start(['name'=>'SV']);
+
+            // MEDIANTE EL ID ELIMINAMOS LOS DATOS DEL ARRAY DEL ITEM SELECCIONADO
+            unset($_SESSION['datos_item'][$idDelete]);
+
+            if(empty($_SESSION['datos_item'])){
+                $alert=[
+                    "Alerta"=>"recargar",
+                    "title"=>"Item eliminado",
+                    "message"=>"El item ha sido eliminado correctamente para el prestamo",
+                    "type"=>"success"
+                ];
+            }else{
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El item no ha sido eliminado correctamente, intente nuevamente",
+                    "type"=>"error"
+                ];
+            }
+            echo json_encode($alert);
+
+        } //FIN CONTROLADOR
+
+        public function dataPrestamoController($tipo, $id){
+            $tipo = mainModel::stringClear($tipo);
+
+            $id = mainModel::decryption($id);
+            $id = mainModel::stringClear($id);
+
+            return prestamosModel::dataPrestamoModel($tipo,$id);
+
+        } //FIN CONTROLADOR
+
+        public function addPrestamoController(){
+            // INICIAMOS SESION PARA UTILIZAR VARAIBLES DE SESION
+            session_start(["name"=>"SV"]);
+
+            // COMPROBANDO PRODUCTOS
+            if($_SESSION['prestamo_item'] == 0){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No has seleccionado productos para realizar el prestamo",
+                    "type"=>"error"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // COMPROBAMOS EL CLIENTE
+            // EMPTY COMPRUEBA SI VIENE VACIO
+            if(empty($_SESSION['datos_cliente'])){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No has seleccionado el cliente para realizar el prestamo",
+                    "type"=>"error"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // RECIBIMO LAS VARIABLES QUE ENVAIMOS POR EL FORM DE AGREGAR EL PRESTAMO
+            $fechaInicio = mainModel::stringClear($_POST['prestamo_fecha_inicio_reg']);
+            $horaInicio = mainModel::stringClear($_POST['prestamo_hora_inicio_reg']);
+            $fechaFinal = mainModel::stringClear($_POST['prestamo_fecha_final_reg']);
+            $horaFinal = mainModel::stringClear($_POST['prestamo_hora_final_reg']);
+            $estado = mainModel::stringClear($_POST['prestamo_estado_reg']);
+            $totalPagado = mainModel::stringClear($_POST['prestamo_pagado_reg']);
+            $observacion = mainModel::stringClear($_POST['prestamo_observacion_reg']);
+
+            // VALIDACION DE DATOS
+            if(mainModel::validationDate($fechaInicio)){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"La fecha inicial no es valida",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            if(mainModel::validationData("([0-1][0-9]|[2][0-3])[\:]([0-5][0-9])",$horaInicio)){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"La hora inicial no es valida",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            if(mainModel::validationDate($fechaFinal)){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"La fecha final no es valida",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            if(mainModel::validationData("([0-1][0-9]|[2][0-3])[\:]([0-5][0-9])",$horaFinal)){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"La hora final no es valida",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            if($estado != "Reservacion" && $estado != "Prestamo" &&
+            $estado != "Finalizado"){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El estado del prestamo no es valida",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            if(mainModel::validationData("[0-9.]{1,10}",$totalPagado)){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El dato del pago no es valida",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            if($observacion != ""){
+                if(mainModel::validationData("[a-zA-z0-9áéíóúÁÉÍÓÚñÑ#() ]{1,400}",$observacion)){
+                    $alert=[
+                        "Alerta"=>"simple",
+                        "title"=>"Error",
+                        "message"=>"El dato de la observacion no es valida",
+                        "type"=>"warning"
+                    ];
+                    echo json_encode($alert);
+                    exit();
+                }
+            }
+
+            //  COMPROBAMOS QUE LAS FECHAS SEAN CORRECTAS
+            // VALIDANDO DE LA SIGUIENTE MANERA
+            if(strtotime($fechaFinal) < strtotime($fechaFinal)){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"La fecha de entrega no puede ser antes a la fecha de inicio
+                    del prestamo",
+                    "type"=>"warning"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            // FORMATEAR TODOS LOS DATOS QUE MANDAMOS A LA BD
+            $totalPrestamo = number_Format($_SESSION['prestamo_total'],0,'','');
+            $totalPagado = number_Format($totalPagado,0,'','');
+            $fechaInicio = date("Y-m-d", strtotime($fechaInicio));
+            $fechaFinal = date("Y-m-d", strtotime($fechaFinal));
+            // FORMATO HORA:MINUTOS FORMATO(AM,PM)
+            $horaInicio = date("h:i a", strtotime($horaInicio));
+            $horaFinal = date("h:i a", strtotime($horaFinal));
+
+            // GENERAR CODIGO DE PRESTAMOS
+            // SI EN EL PRESTAMO NO HAY DATOS = 1
+            // SI HAY DATOS VA A HACER = 2 Y ASI SUSESIVAMENTE
+            $correlativo = mainModel::sqlConsult_Simple("SELECT prestamo_id FROM prestamo");
+            // CONTAR CUANTO REGISTROS SELECCIONO Y SUMARLE UNO
+            $correlativo = ($correlativo->rowCount()) + 1;
+            // GENERAMOS EL CODIGO
+            // codigGenerate($letra, $long, $number)
+            $codigo = mainModel::codigGenerate("P",7,$correlativo);
+
+            // CREAMOS EL ARAY DE DATOS
+            $dataArrayPrestamo = [
+                "CODE"=> $codigo,
+                "DATEINICIO"=>$fechaInicio,
+                "HOURINICIO"=>$horaInicio,
+                "DATEFINAL"=>$fechaFinal,
+                "HOURFINAL"=>$horaFinal,
+                "CANTIDAD"=>$_SESSION['prestamo_item'],
+                "TOTAL"=>$totalPrestamo,
+                "PAGO"=>$totalPagado,
+                "STATUS"=>$estado,
+                "OBSERVATION"=>$observacion,
+                // ADMINISTRADOR QUE HACE EL PRESTAMO
+                "IDUSER"=>$_SESSION['id_sv'],
+                // cliente al que pide el prestamo
+                "IDCLIENT"=>$_SESSION['datos_cliente']['ID']
+            ];
+
+            $addPrestamo = prestamosModel::addPrestamoModel($dataArrayPrestamo);
+
+            // AGREGAMOS PRIMERO LA PRIMERA TABLA DE RELACION QUE ES EL PRESTAMO
+            if($addPrestamo->rowCount() != 1){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error 001",
+                    "message"=>"No hemos podido registrar el prestamo, intente nuevamente!",
+                    "type"=>"error"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // AGREGAMOS LA SEGUNDA TABLA DE RELACION QUE ES EL PAGO
+            // CUANTO EN EL CAMPO TOTAL DEPOSITADO ES MAYOR A CERO SE ESTAN REGISTRANDO DATOS
+            // EN LA TABLA DE PAGO
+            if($totalPagado > 0){
+                $dataArrayPago = [
+                    "TOTAL"=>$totalPagado,
+                    "FECHA"=>$fechaInicio,
+                    "CODEPRESTAMO"=>$codigo
+                ];
+
+                $addPago = prestamosModel::addPagoPrestamoModel($dataArrayPago);
+
+                if($addPago->rowCount() != 1){
+                    // COMO NO SE REGISTRO UN PAGO, ELIMINAMOS LOS DATOS DEL PRESTAMO
+                    // INSERTADOS ANTERIORMENTE
+                    prestamosModel::deletePrestamoModel($codigo,"Prestamo");
+                    $alert=[
+                        "Alerta"=>"simple",
+                        "title"=>"Error 002",
+                        "message"=>"No hemos podido registrar el pago del prestamo, intente nuevamente!",
+                        "type"=>"error"
+                    ];
+                    echo json_encode($alert);
+                    exit();
+                }
+            }
+
+            // AGREGAMOS LA TERCERA TABLA DE RELACION QUE ES EL DETALLE
+            $erroresDetalle = 0;
+
+            foreach($_SESSION['datos_item'] as $items){
+                $costo = number_format($items['COSTO'],0,'','');
+                $descripcion = $items['CODE']." ".$items['NAME'];
+
+                $dataArrayDetalle = [
+                    "CANTIDAD"=>$items["AMOUNT"],
+                    "FORMATO"=>$items["FORMAT"],
+                    "TIEMPO"=>$items["TIEMPO"],
+                    "COSTO"=>$costo,
+                    "DESCRIPCION"=>$descripcion,
+                    "CODEPRESTAMO"=>$codigo,
+                    "IDITEM"=>$items["ID"],
+                ];
+
+                $addDetalle = prestamosModel::addDetailModel($dataArrayDetalle);
+
+                if($addDetalle->rowCount() != 1){
+                    $erroresDetalle = 1;
+                    break;
+                }
+            }
+
+            if($erroresDetalle == 0){
+                unset($_SESSION['datos_cliente']);
+                unset($_SESSION['datos_item']);
+                $alert=[
+                    "Alerta"=>"recargar",
+                    "title"=>"Agregado correctamente",
+                    "message"=>"Los datos del prestamo han sido agregados en el sistema",
+                    "type"=>"success"
+                ];
+            }else{
+                prestamosModel::deletePrestamoModel($codigo,"Detalle");
+                prestamosModel::deletePrestamoModel($codigo,"Pago");
+                prestamosModel::deletePrestamoModel($codigo,"Prestamo");
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error 003",
+                    "message"=>"No hemos podido registrar el pago del prestamo, intente nuevamente!",
+                    "type"=>"warning"
+                ];
+            }
+            echo json_encode($alert);
+        }
     }

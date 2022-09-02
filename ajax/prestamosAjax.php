@@ -6,7 +6,8 @@
     // detectar si se envian datos del formulario
     if( isset($_POST['buscar_cliente']) || isset($_POST['id_agregar_cliente'])
     || isset($_POST['id_eliminar_cliente']) || isset($_POST['buscar_item'])
-    || isset($_POST['id_agregar_item']) ){
+    || isset($_POST['id_agregar_item']) || isset($_POST['id_eliminar_item'])
+    || isset($_POST['prestamo_fecha_final_reg']) ){
 
         require_once "../controllers/prestamosController.php";
         $insPrestamo = new prestamosController();
@@ -14,21 +15,23 @@
         if( isset($_POST['buscar_cliente']) ){
             echo $insPrestamo->searchClientPrestamoController();
         }
-
         if( isset($_POST['id_agregar_cliente']) ){
             echo $insPrestamo->addClientPrestamoController();
         }
-
         if( isset($_POST['id_eliminar_cliente']) ){
             echo $insPrestamo->deleteClientPrestamoController();
         }
-
         if( isset($_POST['buscar_item']) ){
             echo $insPrestamo->searchItemPrestamoController();
         }
-
         if(isset($_POST['id_agregar_item'])){
             echo $insPrestamo->addItemPrestamoController();
+        }
+        if(isset($_POST['id_eliminar_item'])){
+            echo $insPrestamo->deleteItemPrestamoController();
+        }
+        if(isset($_POST['prestamo_fecha_final_reg'])){
+            echo $insPrestamo->addPrestamoController();
         }
 
 

@@ -38,11 +38,21 @@
 		</div>
 	</a>
 
+	<?php
+		require_once "./controllers/prestamosController.php";
+		$insReservacion = new prestamosController();
+		$insPrestamo = new prestamosController();
+		$insFinalizado = new prestamosController();
+
+		$totalReservacion = $insReservacion->dataPrestamoController("conteoReservacion",0);
+		$totalPrestamo = $insPrestamo->dataPrestamoController("conteoPrestamo",0);
+		$totalFinalizado = $insFinalizado->dataPrestamoController("conteoFinalizado",0);
+	?>
 	<a href="<?php echo SERVERURL; ?>reservation-reservation/" class="tile">
 		<div class="tile-tittle">Reservaciones</div>
 		<div class="tile-icon">
 			<i class="far fa-calendar-alt fa-fw"></i>
-			<p>30 Registradas</p>
+			<p><?php echo $totalReservacion->rowCount(); ?> Registradas</p>
 		</div>
 	</a>
 
@@ -50,7 +60,7 @@
 		<div class="tile-tittle">Prestamos</div>
 		<div class="tile-icon">
 			<i class="fas fa-hand-holding-usd fa-fw"></i>
-			<p>200 Registrados</p>
+			<p><?php echo $totalPrestamo->rowCount(); ?> Registrados</p>
 		</div>
 	</a>
 
@@ -58,7 +68,7 @@
 		<div class="tile-tittle">Finalizados</div>
 		<div class="tile-icon">
 			<i class="fas fa-clipboard-list fa-fw"></i>
-			<p>700 Registrados</p>
+			<p><?php echo $totalFinalizado->rowCount(); ?> Registrados</p>
 		</div>
 	</a>
 
