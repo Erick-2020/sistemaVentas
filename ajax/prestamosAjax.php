@@ -7,7 +7,8 @@
     if( isset($_POST['buscar_cliente']) || isset($_POST['id_agregar_cliente'])
     || isset($_POST['id_eliminar_cliente']) || isset($_POST['buscar_item'])
     || isset($_POST['id_agregar_item']) || isset($_POST['id_eliminar_item'])
-    || isset($_POST['prestamo_fecha_final_reg']) ){
+    || isset($_POST['prestamo_fecha_final_reg']) || isset($_POST['prestamo_codigo_del'])
+    || isset($_POST['pago_codigo_reg']) || isset($_POST['prestamo_codigo_up']) ){
 
         require_once "../controllers/prestamosController.php";
         $insPrestamo = new prestamosController();
@@ -32,6 +33,18 @@
         }
         if(isset($_POST['prestamo_fecha_final_reg'])){
             echo $insPrestamo->addPrestamoController();
+        }
+        if(isset($_POST['prestamo_codigo_del'])){
+            echo $insPrestamo->deletePrestamoController();
+        }
+        // INPUT DE LA MODAL PAGO DEL PRESTAMO PARA AGREGAR
+        // UN PAGO NUEVO AL ACTUALZIAR EL PRESTAMO
+        if(isset($_POST['pago_codigo_reg'])){
+            echo $insPrestamo->addPagoPrestamoController();
+        }
+        // INPUT DEL PRESTAMO PARA ACTUALIZAR
+        if(isset($_POST['prestamo_codigo_up'])){
+            echo $insPrestamo->updatePrestamoController();
         }
 
 

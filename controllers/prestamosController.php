@@ -613,5 +613,508 @@
                 ];
             }
             echo json_encode($alert);
-        }
+        } //FIN CONTROLADOR
+        // ES EL MISMO CONTROLADOR QUE LOS DEMAS
+        // CAMBIAMOS LA VARIABLE BUSUQEDA POR TIPO
+        // PARA SABER CUENDA ESTAMOS UTILIZANDO EL PAGINADOR
+        // SI EN LA VISTA DE PRESTAMOS, FINZALIZADOS O BUSQUEDA
+        public function paginadorPrestamoController($actualPage, $registers,
+        $privilegio,$url,$tipo, $fechaInicio, $fechaFinal){
+
+            $actualPage = mainModel::stringClear($actualPage);
+            $registers = mainModel::stringClear($registers);
+            $privilegio = mainModel::stringClear($privilegio);
+
+            $url = mainModel::stringClear($url);
+            $url = SERVERURL.$url."/";
+
+            $tipo = mainModel::stringClear($tipo);
+
+            $fechaInicio = mainModel::stringClear($fechaInicio);
+            $fechaFinal = mainModel::stringClear($fechaFinal);
+
+            $table = "";
+
+            $actualPage = (isset($actualPage) && $actualPage> 0) ? (int) $actualPage : 1;
+            //determinar en que pagina estoy
+            $inicio = ($actualPage >0) ? (($actualPage * $registers) - $registers) : 0;
+
+            // COMPROBAMOS QUE LA FECHA DE INICIO Y LA FINAL SEAN CORRECTAS
+            if($tipo == "Busqueda"){
+                if(mainModel::validationDate($fechaInicio) || mainModel::validationDate($fechaFinal) ){
+                    return '
+                        <div class="alert alert-danger text-center" role="alert">
+                            <p><i class="fas fa-exclamation-triangle fa-5x"></i></p>
+                            <h4 class="alert-heading">¡Ocurrió un error inesperado!</h4>
+                            <p class="mb-0">Las fechas ingresadas para la busqueda no son correctas.</p>
+                        </div>
+                    ';
+                    exit();
+                }
+            }
+            
+            // NO SELEECIONAMOS TODOS LOS DATOS DE UNA SOLA TABLA
+            // SINO QUE SELECCCIONAMOS DATOS DE VARIAS TABLAS
+            // COMO LA DEL PRESTAMO Y LA DE CLIENTES
+            $dataConsult = " prestamo.prestamo_id, prestamo.prestamo_codigo, prestamo.prestamo_fecha_inicio,
+            prestamo.prestamo_fecha_final, prestamo.prestamo_total, prestamo.prestamo_pagado,
+            prestamo.prestamo_estado, prestamo.usuario_id, prestamo.cliente_id, cliente.cliente_nombre,
+            cliente.cliente_apellido";
+
+            // between funciona para declarar el rago por el cual queremos buscar
+            if($tipo == "Busqueda" && $fechaInicio != "" && $fechaFinal != ""){
+                $consulta = "SELECT SQL_CALC_FOUND_ROWS $dataConsult FROM prestamo
+                INNER JOIN cliente ON cliente.cliente_id = prestamo.cliente_id
+                WHERE (prestamo.prestamo_fecha_inicio BETWEEN '$fechaInicio' AND '$fechaFinal')
+                ORDER BY prestamo.prestamo_fecha_inicio DESC LIMIT $inicio, $registers";
+            }else{
+                $consulta = "SELECT SQL_CALC_FOUND_ROWS $dataConsult FROM prestamo
+                INNER JOIN cliente ON cliente.cliente_id = prestamo.cliente_id
+                WHERE prestamo_estado = '$tipo'
+                ORDER BY prestamo.prestamo_fecha_inicio DESC LIMIT $inicio, $registers";
+            }
+
+            $conexion = mainModel::connection();
+
+            // almacenar los datos que se seleccionan en la bd
+            $data = $conexion->query($consulta);
+            // REALIAMOS EL ARRAY DE DATOS
+            $data = $data->fetchAll();
+
+            // contamos todos los registros gracias al parametro que se esta utilizando en la consulta
+            $total = $conexion->query("SELECT FOUND_ROWS()");
+            $total = (int) $total->fetchColumn();
+
+            //REDONDEAR EL NUMERO DE PAGINAS
+            $nPages = ceil($total/$registers);
+
+            $table.='
+                <div class="table-responsive">
+                    <table class="table table-dark table-sm">
+                        <thead>
+                            <tr class="text-center roboto-medium">
+                            <th>#</th>
+                            <th>CLIENTE</th>
+                            <th>FECHA DE PRÉSTAMO</th>
+                            <th>FECHA DE ENTREGA</th>
+                            <th>TIPO</th>
+                            <th>ESTADO</th>
+                            <th>FACTURA</th>';
+                            if($privilegio == 1 || $privilegio == 2){
+                                $table.='<th>ACTUALIZAR</th>';
+                            }
+                            if($privilegio == 1){
+                                $table.='<th>ELIMINAR</th>';
+                            }
+                            $table.='</tr>
+                        </thead>
+                        <tbody>
+            ';
+            // VISTA PARA QUE RECORRA LOS NUMEROS DE LAS PAGINAS Y LOS REGISTROS Y LOS MUESTRE
+            if($total>=1 && $actualPage<=$nPages){
+                $contador = $inicio + 1;
+
+                $reg_inicio = $inicio + 1;
+
+                // CICLO PARA MOSTRAR CADA TR
+                foreach($data as $rows){
+                    $table.= '<tr class="text-center" >
+                                <td>'.$contador.'</td>
+                                <td>'.$rows['cliente_nombre']." ".$rows['cliente_apellido'].'</td>
+                                <td>'.date("d-m-Y",strtotime($rows['prestamo_fecha_inicio'])).'</td>
+                                <td>'.date("d-m-Y",strtotime($rows['prestamo_fecha_final'])).'</td>
+                                <td>'.$rows['prestamo_estado'].'</td>
+                            ';
+                            if($rows['prestamo_pagado'] < $rows['prestamo_total']){
+                                $table.='<td>Pendiente: <span class="badge badge-danger">
+                                    '.MONEDA.number_format(
+                                    ($rows['prestamo_total']-$rows['prestamo_pagado']),0,'',',').'
+                                </span></td>';
+                            }else{
+                                $table.='<td><span class="badge badge-light">Cancelado</span></td>';
+                            }
+
+                            // FACTURA
+                            $table.='
+                                <td>
+                                    <a href="'.SERVERURL.'facturas/invoice.php?id=
+                                    '.mainModel::encryption($rows['prestamo_id']).'"
+                                    class="btn btn-info" target="_blank">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                </td>
+                            ';
+
+
+                            if($privilegio == 1 || $privilegio == 2){
+                                if($rows['prestamo_estado'] == "Finalizado" &&
+                                $rows['prestamo_pagado'] == $rows['prestamo_total'] ){
+                                    $table.='<td>
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                    </td>';
+                                }else{
+                                    $table.='<td>
+                                        <a href="'.SERVERURL.'reservation-update/'
+                                        .mainModel::encryption($rows['prestamo_id']).'/"
+                                        class="btn btn-success">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </a>
+                                    </td>';
+                                }
+                            }
+                            if($privilegio == 1){
+                            $table.='<td>
+                                <form action="'.SERVERURL.'ajax/prestamosAjax.php"
+                                    class="FormularioAjax" method="POST" data-form="delete"
+                                    autocomplete="off">
+                                    <input type="hidden" name="prestamo_codigo_del"
+                                    value="'.mainModel::encryption($rows['prestamo_codigo']).'">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>';
+                            }
+                        $table.='</tr>';
+                    $contador++;
+                }
+                $reg_final = $contador - 1;
+            }else{
+                // VISTA CUANDO NO SE ENCUENTRA UN REGISTRO EN LA TABLA O NO EXISTE
+                if($total>=1){
+                    $table.= '<tr class="text-center"><td colspan="9">
+                        <a href="'.$url.'"
+                            class="btn btn_raised btn_primary btn_sm">Haga click aquí para recargar el listado
+                        </a></td></tr>';
+                }else{
+                    $table.= '<tr class="text-center"> <td colspan="9"> No hay registros en el Sistema</td></tr>';
+                }
+            }
+            $table.= '</tbody></table></div>';
+
+            if($total>=1 && $actualPage<=$nPages){
+                $table.='<p class="text-right">Mostrando prestamos '.$reg_inicio.' al '.$reg_final.'
+                de un total de '.$total.'</p>';
+
+                $table.=mainModel::paginador($actualPage, $nPages, $url, 7);
+            }
+
+            return $table;
+
+        } //FIN CONTROLADOR
+
+        public function deletePrestamoController(){
+
+            // RECUPERAR EL codigo del PRESTAMO a eliminar
+            $codigoDel = mainModel::decryption($_POST['prestamo_codigo_del']);
+            $codigoDel = mainModel::stringClear($codigoDel);
+
+            // COMPROBAMOS PRESTAMO EN LA BD
+            $checkPrestamo = mainModel::sqlConsult_Simple("SELECT prestamo_codigo FROM
+            prestamo WHERE prestamo_codigo ='$codigoDel'");
+
+            if($checkPrestamo->rowCount()<=0){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No encontramos el prestamo que intenta eliminar",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+            // COMPROBANDO PRIVILEGIOS
+            // SOLAMENTE LOS QUE TIENEN PRIVILEGIOS NIVEL 1 (ADMIN) PUEDEN ELIMINAR
+            session_start(['name'=>'SV']);
+            if($_SESSION['privilegio_sv']!=1){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No tienes los permisos necesarios para eliminar prestamos",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // COMPROBAMOS Y ELIMINAMOS DATOS DE LA PRRIMERA TABLA ASOCIADA QUE ES LA DE PAGOS
+            $checkPagos = mainModel::sqlConsult_Simple("SELECT prestamo_codigo FROM pago
+            WHERE prestamo_codigo = '$codigoDel'");
+            $checkPagos=$checkPagos->rowCount();
+            if($checkPagos > 0){
+
+                $pagosDelete = prestamosModel::deletePrestamoModel($codigoDel, "Pago");
+
+                // COMPROBAMOS QUE TODOS LOS DATOS HAYAN SIDO ELIMINADOS
+                if($pagosDelete->rowCount() != $checkPagos){
+                    $alert=[
+                        "Alerta"=>"simple",
+                        "title"=>"Error (Pagos)",
+                        "message"=>"No hemos podido eliminar el prestamo, por favor intente nuevamente",
+                        "type"=>"error",
+                    ];
+                    echo json_encode($alert);
+                    exit();
+                }
+            }
+            // COMPROBAMOS Y ELIMINAMOS DATOS DE LA SEGUNDA TABLA ASOCIADA QUE ES LA DE DETALLE
+            $checkDetalle = mainModel::sqlConsult_Simple("SELECT prestamo_codigo FROM detalle
+            WHERE prestamo_codigo = '$codigoDel'");
+            $checkDetalle=$checkDetalle->rowCount();
+            if($checkDetalle > 0){
+
+                $detalleDelete = prestamosModel::deletePrestamoModel($codigoDel, "Detalle");
+
+                // COMPROBAMOS QUE TODOS LOS DATOS HAYAN SIDO ELIMINADOS
+                if($detalleDelete->rowCount() != $checkDetalle){
+                    $alert=[
+                        "Alerta"=>"simple",
+                        "title"=>"Error (Detalle)",
+                        "message"=>"No hemos podido eliminar el prestamo, por favor intente nuevamente",
+                        "type"=>"error",
+                    ];
+                    echo json_encode($alert);
+                    exit();
+                }
+            }
+
+            // ELIMINAMOS LOS DATOS DE LA TABLA PRESTAMO
+            $prestamoDelete = prestamosModel::deletePrestamoModel($codigoDel, "Prestamo");
+            if($prestamoDelete->rowCount() ==1){
+                $alert=[
+                    "Alerta"=>"recargar",
+                    "title"=>"Eliminado Correctamente",
+                    "message"=>"Se ha eliminado el prestamo correctamente",
+                    "type"=>"success",
+                ];
+            }else{
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No hemos podido eliminar el prestamo, por favor intente nuevamente",
+                    "type"=>"error",
+                ];
+            }
+            echo json_encode($alert);
+        } //FIN CONTROLADOR
+
+        // CONTROLADOR PARAADD PAGOS EN LA MODAL DEL PRESTAMO AL ACTUALIZAR
+        public function addPagoPrestamoController(){
+            $codigo = mainModel::decryption($_POST['pago_codigo_reg']);
+            $codigo = mainModel::stringClear($codigo);
+
+            //CANTIDADA
+            $monto = mainModel::stringClear($_POST['pago_monto_reg']);
+            //FORMATEAR LA CANTIDAD PARA INGRESARLA A LA BD
+            $monto = number_format($monto,0,'','');
+
+            // COMPROBAMOS QUE EL PAGO SEA MAYOR A 0
+            if($monto <= 0){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El pago debe ser mayor a 0",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // COMPROBAMOS QUE EL PRESTAMO EXISTA EN LA BD
+            // SI EXISTE HACEMOS EL ARRAY DE TODOS LOS DATS DEL PRESTAMO
+            $datosPrestamo = mainModel::sqlConsult_Simple("SELECT * FROM prestamo
+            WHERE prestamo_codigo = '$codigo'");
+
+            if($datosPrestamo->rowCount() <= 0){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El prestamo al que intentas agregar al pago
+                    no existe en el sistema",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }else{
+                $datosPrestamo = $datosPrestamo->fetch();
+            }
+
+            // COMPROBAMOS QUE EL MONTO NO SEA MAYOR A LA DEUDA
+            // REALIZAMOS LA VALIDACION DE CUANTO DINERO FALTA
+            $pendiente = number_format((
+                $datosPrestamo['prestamo_total']-$datosPrestamo['prestamo_pagado']
+            ),0,'','');
+
+            if($monto > $pendiente){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No puedes pagar mas de lo que debes",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // COMPROBAMOS LOS PRIVILEGIOS DEL USUARIO PARA ACTUALZIAR EL PAGO
+            session_start(['name'=>'SV']);
+            if($_SESSION['privilegio_sv'] <1 || $_SESSION['privilegio_sv'] >2){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No tienes permisos para actualizar el pago del prestamo",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // CALCULAMOS CUANTO A PAGADO EL CLIENTE
+            // FORMATEAMOS Y CREMOS LA FECHA ACTUAL
+            $totalPagado = number_format((
+                $monto + $datosPrestamo['prestamo_pagado']
+            ),0,'','');
+
+            $fecha = date("Y-m-d");
+
+            // LOS DATOS QUE LE ENVIAMOS AL MODELO
+            $datosPagoReg = [
+                "TOTAL"=> $monto,
+                "FECHA"=>$fecha,
+                "CODEPRESTAMO"=>$codigo
+            ];
+
+            $addPago = prestamosModel::addPagoPrestamoModel($datosPagoReg);
+
+            if($addPago->rowCount() == 1){
+                $datosPrestamoUp = [
+                    "Tipo"=>"Pago",
+                    "MONTO"=>$totalPagado,
+                    "CODIGO"=>$codigo
+                ];
+                if(prestamosModel::updatePrestamoModel($datosPrestamoUp)){
+                    $alert=[
+                        "Alerta"=>"recargar",
+                        "title"=>"Actualizado Correctamente",
+                        "message"=>"El pago de ".MONEDA.$monto." a sido actualizado
+                        correctamente",
+                        "type"=>"success",
+                    ];
+                }else{
+                    // YA SE HA REGISTRADO UN DATO EN LA BD, PERO COMO HA OCURRIDO UN ERROR
+                    // DEBEMOS ELIMINAR EL REGISTRO QUE SE HA HECHO PREVIAMNETE
+                    prestamosModel::deletePrestamoModel($codigo,"Pago");
+                    $alert=[
+                        "Alerta"=>"simple",
+                        "title"=>"Error 001 upPago",
+                        "message"=>"No hemos podido registrar el pago, intente nuevamente",
+                        "type"=>"error",
+                    ];
+                }
+            }else{
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error 002 upPago",
+                    "message"=>"No hemos podido registrar el pago, intente nuevamente",
+                    "type"=>"error",
+                ];
+            }
+            echo json_encode($alert);
+
+        } //FIN CONTROLADOR
+
+        // ACTUALIZAR LOS DATOS DEL PRESTAMO
+        public function updatePrestamoController(){
+
+            $codigo = mainModel::decryption($_POST['prestamo_codigo_up']);
+            $codigo = mainModel::stringClear($codigo);
+
+            // / COMPROBAMOS QUE EL PRESTAMO EXISTA EN LA BD
+            // SI EXISTE HACEMOS EL ARRAY DE TODOS LOS DATS DEL PRESTAMO
+            $checkPrestamo = mainModel::sqlConsult_Simple("SELECT prestamo_codigo
+            FROM prestamo WHERE prestamo_codigo = '$codigo'");
+
+            // COM PROBAMOS QUE EL PRESTAMO EXISTA EN LA BD
+            if($checkPrestamo->rowCount() <= 0){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El prestamo no existe en el sistema",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }else{
+                $checkPrestamo = $checkPrestamo->fetch();
+            }
+
+            // RECIBIMOS DATOS
+            $estado = mainModel::stringClear($_POST['prestamo_estado_up']);
+            $observacion = mainModel::stringClear($_POST['prestamo_observacion_up']);
+
+            // VALIDAMOS LOS DATOS
+            if($observacion != ""){
+                if(mainModel::validationData("[a-zA-z0-9áéíóúÁÉÍÓÚñÑ#() ]{1,400}",$observacion)){
+                    $alert=[
+                        "Alerta"=>"simple",
+                        "title"=>"Error",
+                        "message"=>"La observacion no es valida",
+                        "type"=>"error",
+                    ];
+                    echo json_encode($alert);
+                    exit();
+                }
+            }
+            // COMPROBAMOS EL ESTADO DEL PRESTAMO
+            if($estado != "Reservacion" && $estado != "Prestamo" && $estado != "Finalizado"){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"El estado no es valido",
+                    "type"=>"error"
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            // COMPROBAMOS LOS PRIVILEGIOS DEL USUARIO PARA ACTUALZIAR EL PRESTAMO
+            session_start(['name'=>'SV']);
+            if($_SESSION['privilegio_sv'] <1 || $_SESSION['privilegio_sv'] >2){
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No tienes permisos para actualizar el pago del prestamo",
+                    "type"=>"error",
+                ];
+                echo json_encode($alert);
+                exit();
+            }
+
+            $datosPrestamoUp =[
+                "Tipo"=>"Prestamo",
+                "ESTADO"=>$estado,
+                "OBSERVACION"=>$observacion,
+                "CODIGO"=>$codigo
+            ];
+
+            if(prestamosModel::updatePrestamoModel($datosPrestamoUp)){
+                $alert=[
+                    "Alerta"=>"recargar",
+                    "title"=>"Actualizado Correctamente",
+                    "message"=>"El prestamo a sido actualizado correctamente",
+                    "type"=>"success",
+                ];
+            }else{
+                $alert=[
+                    "Alerta"=>"simple",
+                    "title"=>"Error",
+                    "message"=>"No hemos podido actualizar el prestamo, intente nuevamente",
+                    "type"=>"error",
+                ];
+            }
+            echo json_encode($alert);
+
+        } // FIN CONTROLADOR
     }

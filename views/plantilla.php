@@ -60,7 +60,7 @@
         include "./views/inc/logOut.php";
         }
         include "./views/inc/script.php";
-        
+
     ?>
 </body>
 </html>

@@ -10,7 +10,7 @@
 				<?php echo $_SESSION['nombre_sv']." ".$_SESSION['apellido_sv']; ?> <br><small class="roboto-condensed-light"><?php echo $_SESSION['nombre_sv']; ?></small>
 			</figcaption>
 		</figure>
-		<div class="full-box nav-lateral-bar"></div>
+		<div class="full-box full-box-one nav-lateral-bar"></div>
 			<nav class="full-box nav-lateral-menu">
 				<ul>
 					<li>
