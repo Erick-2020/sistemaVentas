@@ -104,4 +104,67 @@
         $('#ModalAgregarItem').modal('hide');
         $('#ModalItem').modal('show');
     }
+
+    function searchVendedor(){
+        let inputVendedor = document.querySelector('#input_vendedor').value;
+
+        inputVendedor = inputVendedor.trim();
+
+        if(inputVendedor != ""){
+            let data = new FormData();
+            data.append("buscar_vendedor", inputVendedor);
+
+            fetch("<?php echo SERVERURL; ?>ajax/inventarioAjax.php", {
+                method:'POST',
+                body: data
+            })
+            .then(response => response.text())
+            .then(response => {
+                let vendedoresTable = document.querySelector('#tabla_vendedores');
+                vendedoresTable.innerHTML = response;
+            });
+        }else{
+            Swal.fire({
+                title: "Ocurrio un error",
+                text: "Debes introducir los campos necesarios para buscar el vendedor",
+                icon: 'error',
+                confirmButtonText: "Aceptar"
+            })
+        }
+    }
+
+    function addVendedor(id){
+        // OCULTAMOS LA VENTANA MODAL
+        $('#ModalVendedor').modal('hide');
+
+        Swal.fire({
+        title: 'Seguro',
+        text: 'Estas seguro que quieres agregar el vendedor?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: "Agregar",
+        cancelButtonText: "Cancelar"
+        }).then((result)=>{
+            if(result.value){
+                let data = new FormData();
+                data.append("id_agregar_vendedor", id);
+
+                fetch("<?php echo SERVERURL; ?>ajax/inventarioAjax.php", {
+                    method:'POST',
+                    body: data
+                })
+                .then(response => response.json())
+                .then(response => {
+                    return alerts(response);
+                });
+            }else{
+                $('#ModalVendedor').modal('show');
+            }
+        });
+    }
+
+
+
 </script>

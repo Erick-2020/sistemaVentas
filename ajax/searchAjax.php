@@ -11,7 +11,8 @@
             "usuario"=>"user-search",
             "cliente"=>"client-search",
             "item"=>"item-search",
-            "prestamo"=>"reservation-search"
+            "prestamo"=>"reservation-search",
+            "vendedor"=>"inventario-search"
         ];
 
         // COMPROBAR QUE VENGA DEFINIDO EL VALOR QUE VAMOS A BUSCAR

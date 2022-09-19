@@ -40,7 +40,7 @@
 }
 
 body,html{
-	font-family: 'roboto_condensed_light';
+	font-family: cursive;
 	width: 100vw;
 	height: 100vh;
 	background-color: var(--color-edit);
@@ -199,9 +199,10 @@ table form{
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background: #0575E6;
-	background: -webkit-linear-gradient(to left, #0575E6, #0575E6);
-	background: linear-gradient(to right, #0575E6, var(--color-edit));
+	background-image: url("../assets/img/login.jpg");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
 
 }
 .login-content{
@@ -209,7 +210,10 @@ table form{
 	max-width: 320px;
 	height: auto;
 	border: 1px solid var(--border-color);
-	background-color: #FFF;
+	background-image: url("../assets/img/login.jpg");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
 	border-radius: 4px;
 	padding: 15px;
 	color: var(--accent-color);

@@ -4,7 +4,7 @@
 		<i class="fas fa-plus fa-fw"></i> &nbsp; AGREGAR CLIENTE
 	</h3>
 	<p class="text-justify">
-		Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem odit amet asperiores quis minus, dolorem repellendus optio doloremque error a omnis soluta quae magnam dignissimos, ipsam, temporibus sequi, commodi accusantium!
+		Agrega todos los clientes de tu negocio, llena toda la información correspondiente
 	</p>
 </div>
 

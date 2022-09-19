@@ -1,10 +1,10 @@
 <!-- Page header -->
 <div class="full-box page-header">
 	<h3 class="text-left">
-		<i class="fab fa-dashcube fa-fw"></i> &nbsp; DASHBOARD
+		<i class="fab fa-dashcube fa-fw"></i> &nbsp; INICIO
 	</h3>
 	<p class="text-justify">
-		Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit nostrum rerum animi natus beatae ex. Culpa blanditiis tempore amet alias placeat, obcaecati quaerat ullam, sunt est, odio aut veniam ratione.
+	Aquí encontraras todas las opciones con las que puedes interactuar según tu usuario y tus permisos.
 	</p>
 </div>
 
@@ -25,6 +25,7 @@
 		</div>
 	</a>
 	<?php
+			if($_SESSION['privilegio_sv'] == 1){
 			require_once "./controllers/itemController.php";
 			$insItem = new itemController();
 
@@ -35,6 +36,15 @@
 		<div class="tile-icon">
 			<i class="fas fa-pallet fa-fw"></i>
 			<p><?php echo $totalItem->rowCount(); ?> Registrados</p>
+		</div>
+	</a>
+	<?php } ?>
+
+	<a href="<?php echo SERVERURL; ?>inventario-vendedores/" class="tile">
+		<div class="tile-tittle">Invetario - Vendedor</div>
+		<div class="tile-icon">
+			<i class="fas fa-hand-holding-usd fa-fw"></i>
+			<p> nada Registrados</p>
 		</div>
 	</a>
 

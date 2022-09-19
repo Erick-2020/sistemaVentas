@@ -1,7 +1,6 @@
 <!-- Nav lateral -->
 <section class="full-box nav-lateral">
-    <div class="full-box nav-lateral-bg show-nav-lateral">
-    </div>
+    <div class="full-box nav-lateral-bg show-nav-lateral"></div>
 	<div class="full-box nav-lateral-content">
 		<figure class="full-box nav-lateral-avatar">
 			<i class="far fa-times-circle show-nav-lateral"></i>
@@ -31,8 +30,9 @@
 						</ul>
 					</li>
 
+					<?php if($_SESSION['privilegio_sv'] == 1){  ?>
                     <li>
-						<a href="#" class="nav-btn-submenu"><i class="fas fa-pallet fa-fw"></i> &nbsp; PRODUCTOS <i class="fas fa-chevron-down"></i></a>
+						<a href="#" class="nav-btn-submenu"><i class="fas fa-archive"></i> &nbsp; PRODUCTOS <i class="fas fa-chevron-down"></i></a>
 						<ul>
 							<li>
 								<a href="<?php echo SERVERURL; ?>item-new/"><i class="fas fa-plus fa-fw"></i> &nbsp; Agregar producto</a>
@@ -46,7 +46,21 @@
 					        </li>
 						</ul>
     				</li>
-					
+					<?php } ?>
+					<li>
+						<a href="#" class="nav-btn-submenu"><i class="fas fa-archive"></i> &nbsp; INVENTARIO VENDEDOR <i class="fas fa-chevron-down"></i></a>
+						<ul>
+							<li>
+								<a href="<?php echo SERVERURL; ?>inventario-new/"><i class="fas fa-plus fa-fw"></i> &nbsp; Agregar a vendedor</a>
+							</li>
+							<li>
+								<a href="<?php echo SERVERURL; ?>inventario-vendedores/"><i class="fas fa-hand-holding-usd fa-fw"></i> &nbsp; Inventarios</a>
+							</li>
+							<li>
+								<a href="<?php echo SERVERURL; ?>inventario-search/"><i class="fas fa-search-dollar fa-fw"></i> &nbsp; Buscar por fecha</a>
+                            </li>
+						</ul>
+					</li>
                     <li>
 						<a href="#" class="nav-btn-submenu"><i class="fas fa-file-invoice-dollar fa-fw"></i> &nbsp; PRÉSTAMOS <i class="fas fa-chevron-down"></i></a>
 						<ul>
